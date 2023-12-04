@@ -2,17 +2,14 @@
 CREATE SCHEMA destruction;
 USE destruction;
 
+-- Tables
+
 -- Players Table
 CREATE TABLE players (
     player_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     email VARCHAR(100)
-);
--- Winners Table
-CREATE TABLE winners (
-    character_id INT UNSIGNED PRIMARY KEY,
-    FOREIGN KEY (character_id) REFERENCES characters(character_id)
 );
 
 -- Characters Table
@@ -23,12 +20,18 @@ CREATE TABLE characters (
     level INT,
     FOREIGN KEY (player_id) REFERENCES players(player_id)
 );
--- Characters stats Table
+
+-- Winners Table
+CREATE TABLE winners (
+    character_id INT UNSIGNED PRIMARY KEY,
+    FOREIGN KEY (character_id) REFERENCES characters(character_id)
+);
+
+-- Character Stats Table
 CREATE TABLE character_stats (
     character_id INT UNSIGNED PRIMARY KEY,
     health INT,
     armor INT,
-    -- Add other necessary columns
     FOREIGN KEY (character_id) REFERENCES characters(character_id)
 );
 
@@ -73,46 +76,53 @@ CREATE TABLE equipped (
     FOREIGN KEY (item_id) REFERENCES items(item_id)
 );
 
+-- Views
+
 -- character_items View
 CREATE VIEW character_items AS
-SELECT c.character_id, c.name AS character_name, i.name AS item_name, i.armor, i.damage
+SELECT ci.character_id, c.name AS character_name, i.name AS item_name, i.armor AS item_armor, i.damage AS item_damage
 FROM characters c
 LEFT JOIN inventory inv ON c.character_id = inv.character_id
 LEFT JOIN items i ON inv.item_id = i.item_id
 UNION
-SELECT c.character_id, c.name AS character_name, i.name AS item_name, i.armor, i.damage
+SELECT ce.character_id, c.name AS character_name, i.name AS item_name, i.armor AS item_armor, i.damage AS item_damage
 FROM characters c
 LEFT JOIN equipped eq ON c.character_id = eq.character_id
 LEFT JOIN items i ON eq.item_id = i.item_id;
 
 -- team_items View
 CREATE VIEW team_items AS
-SELECT tm.team_id, t.name AS team_name, i.name AS item_name, i.armor, i.damage
+SELECT tm.team_id, t.name AS team_name, i.name AS item_name, i.armor AS item_armor, i.damage AS item_damage
 FROM team_members tm
 JOIN teams t ON tm.team_id = t.team_id
 JOIN characters c ON tm.character_id = c.character_id
 LEFT JOIN inventory inv ON c.character_id = inv.character_id
 LEFT JOIN items i ON inv.item_id = i.item_id
 UNION
-SELECT tm.team_id, t.name AS team_name, i.name AS item_name, i.armor, i.damage
+SELECT tm.team_id, t.name AS team_name, i.name AS item_name, i.armor AS item_armor, i.damage AS item_damage
 FROM team_members tm
 JOIN teams t ON tm.team_id = t.team_id
 JOIN characters c ON tm.character_id = c.character_id
 LEFT JOIN equipped eq ON c.character_id = eq.character_id
 LEFT JOIN items i ON eq.item_id = i.item_id;
 
+-- Functions
 
 -- armor_total Function
 DELIMITER //
-CREATE FUNCTION armor_total(character_id_param INT UNSIGNED) RETURNS INT READS SQL DATA
+CREATE FUNCTION armor_total(character_id_param INT UNSIGNED) RETURNS INT
 BEGIN
     DECLARE total_armor INT;
-    SELECT COALESCE(SUM(ci.armor), 0) INTO total_armor
-    FROM character_items ci
-    WHERE ci.character_id = character_id_param;
+    SELECT COALESCE(SUM(cs.armor) + SUM(i.armor), 0) INTO total_armor
+    FROM character_stats cs
+    JOIN equipped eq ON cs.character_id = eq.character_id
+    JOIN items i ON eq.item_id = i.item_id
+    WHERE cs.character_id = character_id_param;
     RETURN total_armor;
 END //
 DELIMITER ;
+
+-- Procedures
 
 -- attack Procedure
 DELIMITER //
@@ -120,19 +130,19 @@ CREATE PROCEDURE attack(id_of_character_being_attacked INT UNSIGNED, id_of_equip
 BEGIN
     DECLARE character_armor INT;
     DECLARE item_damage INT;
-    DECLARE net_damage INT;
     
     SELECT armor_total(id_of_character_being_attacked) INTO character_armor;
     SELECT damage INTO item_damage FROM items WHERE item_id = id_of_equipped_item_used_for_attack;
     
+    DECLARE net_damage INT;
     SET net_damage = item_damage - character_armor;
     
     IF net_damage > 0 THEN
-        UPDATE characters SET health = health - net_damage WHERE character_id = id_of_character_being_attacked;
-        IF (SELECT health FROM characters WHERE character_id = id_of_character_being_attacked) <= 0 THEN
+        UPDATE character_stats SET health = health - net_damage WHERE character_id = id_of_character_being_attacked;
+        IF (SELECT health FROM character_stats WHERE character_id = id_of_character_being_attacked) <= 0 THEN
             DELETE FROM characters WHERE character_id = id_of_character_being_attacked;
             DELETE FROM team_members WHERE character_id = id_of_character_being_attacked;
-            -- Delete other related data or perform additional actions
+            -- Delete other related data or perform additional actions as needed
         END IF;
     END IF;
 END //
@@ -165,7 +175,7 @@ DELIMITER //
 CREATE PROCEDURE set_winners(team_id_param INT UNSIGNED)
 BEGIN
     DELETE FROM winners;
-    
+    -- Insert logic to update winners table with characters in the specified team
+    -- Use INSERT INTO winners SELECT... to add the relevant character_ids
 END //
 DELIMITER ;
-
