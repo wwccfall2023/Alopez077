@@ -82,6 +82,8 @@ LEFT JOIN inventory inv ON c.character_id = inv.character_id
 LEFT JOIN equipped eq ON c.character_id = eq.character_id
 LEFT JOIN items i ON inv.item_id = i.item_id OR eq.item_id = i.item_id;
 
+DELIMITER //
+
 CREATE FUNCTION armor_total(character_id INT UNSIGNED) RETURNS INT
 BEGIN
     DECLARE total_armor INT;
@@ -96,9 +98,8 @@ BEGIN
     WHERE eq.character_id = character_id;
 
     RETURN total_armor;
-END;
+END //
 
-DELIMITER //
 CREATE PROCEDURE attack(IN id_of_character_being_attacked INT UNSIGNED, IN id_of_equipped_item_used_for_attack INT UNSIGNED)
 BEGIN
     DECLARE character_armor INT;
@@ -125,11 +126,8 @@ BEGIN
             DELETE FROM winners WHERE character_id = id_of_character_being_attacked;
         END IF;
     END IF;        
-END;
-//
-DELIMITER ;
+END //
 
-DELIMITER //
 CREATE PROCEDURE equip(IN inventory_id INT UNSIGNED)
 BEGIN
     DECLARE item_id_to_equip INT UNSIGNED;
@@ -145,11 +143,8 @@ BEGIN
 
     DELETE FROM inventory
     WHERE inventory_id = inventory_id;
-END;
-//
-DELIMITER ;
+END //
 
-DELIMITER //
 CREATE PROCEDURE unequip(IN equipped_id INT UNSIGNED)
 BEGIN
     DECLARE item_id_to_unequip INT UNSIGNED;
@@ -165,11 +160,7 @@ BEGIN
 
     DELETE FROM equipped
     WHERE equipped_id = equipped_id;
-END;
-//
-DELIMITER ;
-
-DELIMITER //
+END //
 
 CREATE PROCEDURE set_winners(IN team_id INT UNSIGNED)
 BEGIN
@@ -178,6 +169,5 @@ BEGIN
     SELECT tm.character_id
     FROM team_members tm
     WHERE tm.team_id = team_id;
-END;
-//
+END //
 DELIMITER ;
