@@ -66,14 +66,14 @@ CREATE TABLE equipped (
     FOREIGN KEY (item_id) REFERENCES items(item_id)
 );
 
-CREATE VIEW character_items AS
+CREATE OR REPLACE VIEW character_items AS
 SELECT c.character_id, c.name AS character_name, i.name AS item_name, i.armor, i.damage
 FROM characters c
 LEFT JOIN inventory inv ON c.character_id = inv.character_id
 LEFT JOIN equipped eq ON c.character_id = eq.character_id
 LEFT JOIN items i ON inv.item_id = i.item_id OR eq.item_id = i.item_id;
 
-CREATE VIEW team_items AS
+CREATE OR REPLACE VIEW team_items AS
 SELECT tm.team_id, t.name AS team_name, i.name AS item_name, i.armor, i.damage
 FROM team_members tm
 JOIN teams t ON tm.team_id = t.team_id
@@ -84,16 +84,16 @@ LEFT JOIN items i ON inv.item_id = i.item_id OR eq.item_id = i.item_id;
 
 DELIMITER //
 
-CREATE FUNCTION armor_total(character_id INT UNSIGNED) RETURNS INT
+CREATE OR REPLACE FUNCTION armor_total(character_id INT UNSIGNED) RETURNS INT
 DETERMINISTIC
 BEGIN
     DECLARE total_armor INT;
     
-    SELECT SUM(cs.armor) INTO total_armor
+    SELECT COALESCE(SUM(cs.armor), 0) INTO total_armor
     FROM character_stats cs
     WHERE cs.character_id = character_id;
 
-    SELECT SUM(i.armor) INTO total_armor
+    SELECT COALESCE(SUM(i.armor), 0) INTO total_armor
     FROM equipped eq
     JOIN items i ON eq.item_id = i.item_id
     WHERE eq.character_id = character_id;
