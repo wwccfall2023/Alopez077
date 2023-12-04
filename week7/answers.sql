@@ -107,10 +107,13 @@ CREATE PROCEDURE attack(id_of_character_being_attacked INT UNSIGNED, id_of_equip
 BEGIN
     DECLARE character_armor INT;
     DECLARE item_damage INT;
+    
     SELECT armor_total(id_of_character_being_attacked) INTO character_armor;
     SELECT damage INTO item_damage FROM items WHERE item_id = id_of_equipped_item_used_for_attack;
+    
     DECLARE net_damage INT;
     SET net_damage = item_damage - character_armor;
+    
     IF net_damage > 0 THEN
         UPDATE characters SET health = health - net_damage WHERE character_id = id_of_character_being_attacked;
         IF (SELECT health FROM characters WHERE character_id = id_of_character_being_attacked) <= 0 THEN
