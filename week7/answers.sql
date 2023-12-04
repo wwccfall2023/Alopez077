@@ -123,7 +123,8 @@ BEGIN
             DELETE FROM characters WHERE character_id = id_of_character_being_attacked;
             DELETE FROM team_members WHERE character_id = id_of_character_being_attacked;
             DELETE FROM winners WHERE character_id = id_of_character_being_attacked;
-            
+        END IF;
+    END IF;        
 END;
 //
 DELIMITER ;
@@ -169,6 +170,7 @@ END;
 DELIMITER ;
 
 DELIMITER //
+
 CREATE PROCEDURE set_winners(IN team_id INT UNSIGNED)
 BEGIN
     DELETE FROM winners;
