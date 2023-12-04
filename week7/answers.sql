@@ -80,12 +80,12 @@ CREATE TABLE equipped (
 
 -- character_items View
 CREATE VIEW character_items AS
-SELECT ci.character_id, c.name AS character_name, i.name AS item_name, i.armor AS item_armor, i.damage AS item_damage
+SELECT c.character_id, c.name AS character_name, i.name AS item_name, i.armor AS item_armor, i.damage AS item_damage
 FROM characters c
 LEFT JOIN inventory inv ON c.character_id = inv.character_id
 LEFT JOIN items i ON inv.item_id = i.item_id
 UNION
-SELECT ce.character_id, c.name AS character_name, i.name AS item_name, i.armor AS item_armor, i.damage AS item_damage
+SELECT c.character_id, c.name AS character_name, i.name AS item_name, i.armor AS item_armor, i.damage AS item_damage
 FROM characters c
 LEFT JOIN equipped eq ON c.character_id = eq.character_id
 LEFT JOIN items i ON eq.item_id = i.item_id;
