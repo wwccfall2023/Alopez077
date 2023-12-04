@@ -91,7 +91,7 @@ JOIN characters c ON tm.character_id = c.character_id
 LEFT JOIN equipped eq ON c.character_id = eq.character_id
 LEFT JOIN items i ON eq.item_id = i.item_id;
 
-CREATE FUNCTION armor_total(character_id INT) RETURNS INT
+CREATE FUNCTION armor_total(character_id INT) RETURNS INT READS SQL DATA
 BEGIN
     DECLARE total_armor INT;
     SELECT COALESCE(SUM(cs.armor) + SUM(i.armor), 0)
