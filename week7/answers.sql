@@ -9,6 +9,11 @@ CREATE TABLE players (
     last_name VARCHAR(50),
     email VARCHAR(100)
 );
+-- Winners Table
+CREATE TABLE winners (
+    character_id INT UNSIGNED PRIMARY KEY,
+    FOREIGN KEY (character_id) REFERENCES characters(character_id)
+);
 
 -- Characters Table
 CREATE TABLE characters (
@@ -18,7 +23,7 @@ CREATE TABLE characters (
     level INT,
     FOREIGN KEY (player_id) REFERENCES players(player_id)
 );
-
+-- Characters stats Table
 CREATE TABLE character_stats (
     character_id INT UNSIGNED PRIMARY KEY,
     health INT,
