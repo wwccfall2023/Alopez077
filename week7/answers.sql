@@ -82,6 +82,7 @@ LEFT JOIN inventory inv ON c.character_id = inv.character_id
 LEFT JOIN equipped eq ON c.character_id = eq.character_id
 LEFT JOIN items i ON inv.item_id = i.item_id OR eq.item_id = i.item_id;
 
+DROP FUNCTION IF EXISTS armor_total;
 DELIMITER //
 
 CREATE OR REPLACE FUNCTION armor_total(character_id INT UNSIGNED) RETURNS INT
