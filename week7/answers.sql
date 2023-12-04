@@ -85,6 +85,7 @@ LEFT JOIN items i ON inv.item_id = i.item_id OR eq.item_id = i.item_id;
 DELIMITER //
 
 CREATE FUNCTION armor_total(character_id INT UNSIGNED) RETURNS INT
+DETERMINISTIC
 BEGIN
     DECLARE total_armor INT;
     
