@@ -91,7 +91,7 @@ LEFT JOIN items i ON eq.item_id = i.item_id;
 
 -- armor_total Function
 DELIMITER //
-CREATE FUNCTION armor_total(character_id_param INT UNSIGNED) RETURNS INT
+CREATE FUNCTION armor_total(character_id_param INT UNSIGNED) RETURNS INT READS SQL DATA
 BEGIN
     DECLARE total_armor INT;
     SELECT COALESCE(SUM(ci.armor), 0) INTO total_armor
