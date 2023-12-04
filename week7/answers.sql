@@ -19,6 +19,14 @@ CREATE TABLE characters (
     FOREIGN KEY (player_id) REFERENCES players(player_id)
 );
 
+CREATE TABLE character_stats (
+    character_id INT UNSIGNED PRIMARY KEY,
+    health INT,
+    armor INT,
+    -- Add other necessary columns
+    FOREIGN KEY (character_id) REFERENCES characters(character_id)
+);
+
 -- Teams Table
 CREATE TABLE teams (
     team_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
