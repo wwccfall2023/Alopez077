@@ -56,7 +56,7 @@ CREATE TABLE equipped (
     FOREIGN KEY (item_id) REFERENCES items(item_id)
 );
 CREATE VIEW character_items AS
-SELECT c.character_id, ch.name AS character_name, i.name AS item_name, i.armor, i.damage
+SELECT ch.character_id, ch.name AS character_name, i.name AS item_name, i.armor, i.damage
 FROM characters ch
 JOIN inventory inv ON ch.character_id = inv.character_id
 JOIN items i ON inv.item_id = i.item_id
@@ -85,12 +85,14 @@ CREATE FUNCTION armor_total(character_id INT) RETURNS INT
 DELIMITER //
 BEGIN
     DECLARE total_armor INT;
+    
     SELECT COALESCE(SUM(cs.armor), 0) + COALESCE(SUM(i.armor), 0) AS total
     INTO total_armor
     FROM character_stats cs
     JOIN equipped eq ON cs.character_id = eq.character_id
     JOIN items i ON eq.item_id = i.item_id
     WHERE cs.character_id = character_id;
+    
     RETURN total_armor;
 END;
 DELIMITER ;
