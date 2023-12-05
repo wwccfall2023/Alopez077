@@ -55,6 +55,7 @@ CREATE TABLE equipped (
     FOREIGN KEY (character_id) REFERENCES characters(character_id),
     FOREIGN KEY (item_id) REFERENCES items(item_id)
 );
+
 CREATE VIEW character_items AS
 SELECT ch.character_id, ch.name AS character_name, i.name AS item_name, i.armor, i.damage
 FROM characters ch
@@ -82,8 +83,8 @@ JOIN equipped eq ON ch.character_id = eq.character_id
 JOIN items i ON eq.item_id = i.item_id;
 
 DELIMITER //
+
 CREATE FUNCTION armor_total(character_id INT) RETURNS INT
-DETERMINISTIC
 BEGIN
     DECLARE total_armor INT;
     
@@ -96,9 +97,8 @@ BEGIN
     
     RETURN total_armor;
 END;
-DELIMITER ;
+//
 
-DELIMITER //
 CREATE PROCEDURE attack(IN attacked_character_id INT, IN attacking_item_id INT)
 BEGIN
     DECLARE total_armor INT;
@@ -126,9 +126,8 @@ BEGIN
         -- Assuming cascading deletes are enabled for character-related tables to delete their possessions and team membership
     END IF;
 END;
-DELIMITER ;
+//
 
-DELIMITER //
 CREATE PROCEDURE equip(IN inventory_item_id INT)
 BEGIN
     DECLARE equipped_item_id INT;
@@ -145,9 +144,8 @@ BEGIN
     DELETE FROM inventory
     WHERE inventory_id = inventory_item_id;
 END;
-DELIMITER ;
+//
 
-DELIMITER //
 CREATE PROCEDURE unequip(IN equipped_item_id INT)
 BEGIN
     DECLARE inventory_item_id INT;
@@ -164,9 +162,8 @@ BEGIN
     DELETE FROM equipped
     WHERE equipped_id = equipped_item_id;
 END;
-DELIMITER ;
+//
 
-DELIMITER //
 CREATE PROCEDURE set_winners(IN team_id INT)
 BEGIN
     DELETE FROM winners;
@@ -176,4 +173,9 @@ BEGIN
     FROM team_members
     WHERE team_id = team_id;
 END;
+//
+
 DELIMITER ;
+
+
+
