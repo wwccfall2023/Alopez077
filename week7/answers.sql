@@ -12,6 +12,7 @@ CREATE TABLE characters (
     character_id INT UNSIGNED PRIMARY KEY,
     player_id INT UNSIGNED,
     name VARCHAR(255),
+    level INT,
     FOREIGN KEY (player_id) REFERENCES players(player_id)
 );
 CREATE TABLE winners (
