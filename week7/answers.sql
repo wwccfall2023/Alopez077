@@ -30,7 +30,7 @@ CREATE TABLE teams (
     name VARCHAR(255)
 );
 CREATE TABLE team_members (
-    team_member_id INT UNSIGNED PRIMARY KEY,
+    team_member_id INT UNSIGNED PRIMARY KEY AUTO INCREMENT,
     team_id INT UNSIGNED,
     character_id INT UNSIGNED,
     FOREIGN KEY (team_id) REFERENCES teams(team_id),
